@@ -1,0 +1,597 @@
+  
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Socket.io multiple</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-deep_purple.min.css" />    
+    <style>
+      .messageArea {
+        display: none;
+      }
+
+      .inline {
+        display: inline-block;
+      }
+
+      .text_center {
+        text-align: center;
+      }
+
+      .central_input {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        border: none;
+        border-top: 1px solid #e0e0e0;
+        outline: none;
+        padding: 14px;
+        font-size: 14px;
+      }
+
+      .central_input:focus {
+        border-color: #3f51b5;
+      }
+
+      #messages {
+        height: calc(100% - 108px);
+        padding: 14px;
+      }
+
+      .pos_absolute {
+        position: absolute;
+      }
+
+      .mdl-button--icon:hover {
+        cursor: pointer;
+      }
+
+      .event {
+        background-color: #3f51b5;
+      }
+
+      #addroom {
+        display: none;
+        border: 1px solid #e0e0e0;
+        position: absolute;
+        top: 64px;
+        background: #fff;
+        z-index: 5;
+        right: 0;
+        text-align: center;
+      }
+
+      #addRoom form {
+        padding: 25px;
+      }
+
+      #userError, #roomError, #roomPassError, #passError {
+        color: red;
+      }
+
+      .userFormDiv {
+        margin: 0 auto;
+        color: #3f51b5;
+      }
+
+      .current_room {
+        color: #3f51b5;
+        text-decoration: underline;
+      }
+
+      .roomDisplay {
+        position: absolute;
+        width: calc(100% - 240px);
+        text-align: center;
+      }
+
+      .current_roomHolder {
+        border-bottom: 1px solid #e0e0e0;
+        width: 100%;
+      }
+
+      .username_msg {
+        color: #3f51b5;
+        text-decoration: underline;
+        display: block;
+      }
+
+      .current_roomHolder a {
+        color: red;
+      }
+
+      .msg {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 20px;
+        width: fit-content;
+        max-width: 35%;
+        margin: 10px;
+      }
+
+      .msg_cont {
+        width: 100%;
+      }
+
+      .mdl-layout__content {
+        width: calc(100% - 240px);
+      }
+
+      .notification {
+        background: #b3d4fc;
+      }
+
+      .personal_msg {
+        float: right;
+      }
+
+      .buldge {
+        background: #fff;
+        padding: 25px;
+        width: max-content;
+        margin: 0 auto;
+      }
+
+      .edge--bottom {
+        position: relative;
+        z-index: 1;
+      }
+      .edge--bottom:after {
+        background: inherit;
+        content: "";
+        display: block;
+        height: 50%;
+        left: 0;
+        position: absolute;
+        right: 0;
+        z-index: -1;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+      }
+      .edge--bottom:after {
+        bottom: 0;
+        transform: skewY(-1.5deg);
+        transform-origin: 100%;
+      }
+
+      .edge--bottom--reverse {
+        position: relative;
+        z-index: 1;
+      }
+      .edge--bottom--reverse:after {
+        background: inherit;
+        content: "";
+        display: block;
+        height: 50%;
+        left: 0;
+        position: absolute;
+        right: 0;
+        z-index: -1;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+      }
+      .edge--bottom--reverse:after {
+        bottom: 0;
+        transform: skewY(1.5deg);
+        transform-origin: 0 100%;
+      }
+
+      .edge--top {
+        position: relative;
+        z-index: 1;
+      }
+      .edge--top:before {
+        background: inherit;
+        content: "";
+        display: block;
+        height: 50%;
+        left: 0;
+        position: absolute;
+        right: 0;
+        z-index: -1;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+      }
+      .edge--top:before {
+        top: 0;
+        transform: skewY(1.5deg);
+        transform-origin: 100% 0;
+      }
+
+      .edge--top--reverse {
+        position: relative;
+        z-index: 1;
+      }
+      .edge--top--reverse:before {
+        background: inherit;
+        content: "";
+        display: block;
+        height: 50%;
+        left: 0;
+        position: absolute;
+        right: 0;
+        z-index: -1;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+      }
+      .edge--top--reverse:before {
+        top: 0;
+        transform: skewY(-1.5deg);
+        transform-origin: 0 0;
+      }
+
+      .edge--both {
+        position: relative;
+        z-index: 1;
+      }
+      .edge--both:before, .edge--both:after {
+        background: inherit;
+        content: "";
+        display: block;
+        height: 50%;
+        left: 0;
+        position: absolute;
+        right: 0;
+        z-index: -1;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+      }
+      .edge--both:before {
+        top: 0;
+        transform: skewY(1.5deg);
+        transform-origin: 100% 0;
+      }
+      .edge--both:after {
+        bottom: 0;
+        transform: skewY(-1.5deg);
+        transform-origin: 100%;
+      }
+
+      .edge--both--reverse {
+        position: relative;
+        z-index: 1;
+      }
+      .edge--both--reverse:before, .edge--both--reverse:after {
+        background: inherit;
+        content: "";
+        display: block;
+        height: 50%;
+        left: 0;
+        position: absolute;
+        right: 0;
+        z-index: -1;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+      }
+      .edge--both--reverse:before {
+        top: 0;
+        transform: skewY(-1.5deg);
+        transform-origin: 0 0;
+      }
+      .edge--both--reverse:after {
+        bottom: 0;
+        transform: skewY(1.5deg);
+        transform-origin: 0 0;
+      }
+
+      .-indigo {
+        background: #3f51b5;
+      }
+
+      .-berry {
+        background: #b52b4a;
+      }
+
+      .-orange {
+        background: #de6628;
+      }
+
+      .blocky {
+        color: #fff;
+        font-family: "Fira Sans", sans-serif;
+        margin: 0 0 200px;
+        padding: 15% 20px;
+        text-align: center;
+      }
+
+      h4 {
+        width: 60%;
+        margin: 0 auto;
+      }
+
+      .big_icon {
+        padding: 30px;
+        color: #fff;
+        border-radius: 50%;
+        width: max-content;
+        margin: 0 auto;
+      }
+
+      .big_icon i {
+        font-size: 50px;
+      }
+
+      .mdl-layout__container {
+        height: 0;
+      }
+    </style>
+  </head>
+  <body>  
+    <div id="userArea" class="text_center">
+      <div class="blocky -indigo edge--bottom">
+          <h1>Socket Chat</h1>
+          <h3 id='initChat'></h3>
+          <form id="userForm" class="buldge">
+              <p id='passError'></p>
+            <div class="block userFormDiv mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+              <input class="mdl-textfield__input" type="text" id="username" maxlength="20">
+              <label class="mdl-textfield__label" for="username">Username (max. 20 characters)</label>
+            </div>
+            <p id='userError'></p>
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                Join Chat!
+            </button>
+          </form>
+        </div>
+        <div class="-berry big_icon">
+            <i class="material-icons">chat</i>
+        </div>
+        <div class="blocky -berry edge--bottom--reverse">
+          <h1>Chatting for everyone</h1>
+          <h4>Socket Chat is a place where anyone can chat with the other people of the internet in real-time.</h4>
+        </div>
+        <div class="-indigo big_icon">
+          <i class="material-icons">add</i>
+        </div>
+        <div class="blocky -indigo edge--top">
+          <h1>Create Chatrooms</h1>
+          <h4>Socket Chat allows you to create both public and private(password protected) chatrooms. The chatrooms will disappear when all the users will leave. A chat link will be created that you can use to invite other people.</h4>
+        </div>
+        <div class="-orange big_icon">
+            <i class="material-icons">speaker_notes_off</i>
+        </div>
+        <div class="blocky -orange edge--top--reverse">
+          <h1>No Messages Saved</h1>
+          <h4>Yes Socket Chat does not save messages anywhere! The messages are received and delivered by the users without interference from the server.</h4>
+        </div>
+        <div class="-berry big_icon">
+            <i class="material-icons">feedback</i>
+        </div>
+        <div class="blocky -berry  edge--both">
+            <h1>Any other cool features?</h1>
+            <h4>If you have any suggestions to the platform please do contact the creator!</h4>
+            <br/>
+            <h4 class="-indigo buldge">vitsuji123@gmail.com</h4>
+        </div>
+    </div>
+
+    <div class="messageArea mdl-layout mdl-js-layout mdl-layout--fixed-drawer
+                                        mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <div class="mdl-layout-spacer"></div>
+          <div class="personalTitle pos_absolute">
+            <span class="mdl-layout-title inline">Socket Chat -</span>
+            <span class="inline mdl-layout-title" id='usernameDisplay'></span>
+          </div>
+          <div class="inline roomDisplay mdl-layout-title">
+
+          </div>
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                  mdl-textfield--floating-label mdl-textfield--align-right">
+            <!-- <label class="mdl-js-button mdl-button--icon" for="fixed-header-drawer-exp">
+              <i id="addRoom-btn" class="material-icons" onclick="addRoom()">add</i>
+            </label> -->
+            <button onclick="addRoom()" class="room_event mdl-button mdl-js-button mdl-button--icon mdl-button--fab mdl-js-ripple-effect">
+              <i class="material-icons">add</i>
+            </button>
+          </div>
+          </div>
+        </header>
+        <div class="mdl-layout__drawer">
+          <span class="mdl-layout-title">Public Chat Rooms</span>
+          <nav class="current_roomHolder mdl-navigation">
+          </nav>
+          <nav class="public_rooms mdl-navigation">
+          </nav>
+        </div>
+        <main class="mdl-layout__content">
+          <div class="page-content">
+            <div id="messages"></div>
+            <input id='messageInput' class="central_input" type="text" placeholder="Write a message...">
+          </div>
+        </main>
+        <div id="addRoom">
+          <h2>Create a room</h2>
+          <form id="addRoomForm" action="#">
+            <div class="block mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+              <input class="mdl-textfield__input" type="text" id="roomName" maxlength="15">
+              <label class="mdl-textfield__label" for="roomName">Room Name(15 characters)</label>
+            </div>
+            <p id='roomError'></p>
+            <div class="block mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+              <input class="mdl-textfield__input" type="password" id="roomPass">
+              <label class="mdl-textfield__label" for="roomPass">Room Password</label>
+            </div>
+            <p id='roomPassError'></p>
+            <p>Leave password blank if you wish to create a public chat.</p>
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+                Create
+            </button>
+          </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script>
+      $(document).ready(function(){
+
+        let socket = io.connect('');
+        let url = window.location.protocol + "//" + window.location.host;
+
+        let $userArea = $('#userArea');
+        let $userForm = $('#userForm');
+        let $username = $('#username');
+        let $userError = $('#userError');
+        
+        let $messageArea = $('.messageArea');
+        let $messages = $('#messages');
+        let current_room;
+
+        let $addRoomForm = $('#addRoomForm');
+        let $roomName = $('#roomName');
+        let $roomPass = $('#roomPass');
+        let $roomError = $('#roomError');
+        let $roomPassError = $('#roomPassError');
+        
+        let $roomDisplay = $('.roomDisplay');
+        let $initChat = $('#initChat');
+
+        let my_username;
+
+        socket.on('init room', function (room) {
+          current_room = room;
+          $initChat.html(`Public Chat: ${current_room}`);
+        });
+
+        socket.on('private init room', function (room) {
+          current_room = room;
+          $initChat.html(`Private Chat: ${current_room}`);
+          $userForm.prepend("<div class='userFormDiv block mdl-textfield mdl-js-textfield mdl-textfield--floating-label'><input class='mdl-textfield__input' type='password' id='roomPassInit'><label class='mdl-textfield__label' for='roomPasssInit'>Password</label></div>");
+        });
+
+
+        // on connection to server, ask for user's name with an anonymous callback
+        $userForm.submit(function(e){
+          e.preventDefault();
+          let usernameProtected = $username.val().replace(/(<([^>]+)>)/ig,"");
+
+          if(/\s/g.test(usernameProtected)) {
+            $userError.html("No Whitespaces Allowed");
+          }else if(usernameProtected == ''){
+            $userError.html("Username cannot be empty");
+          }else{
+            let userdata;
+
+            if ($("#roomPassInit")[0]){
+              userdata = usernameProtected + ' ' +current_room + ' '+ $('#roomPassInit').val();
+            } else {
+              userdata = usernameProtected + ' ' +current_room;
+            }
+              $('#usernameDisplay').html(usernameProtected);
+              socket.emit('new user', userdata, function(data){
+                if(data) {
+                  $userArea.hide();
+                  $messageArea.fadeIn();
+                  $('.mdl-layout__container').css('height', '100%');
+                  my_username = usernameProtected;
+                }else {
+                  $('#passError').html('Incorrect password.');
+                }
+              });
+              $username.val('');
+            }
+        });
+
+        // listener, whenever the server emits 'updatechat', this updates the chat body
+        socket.on('updatechat', function (username, data) {
+          if(username == 'SERVER') {
+            $messages.append(`<div class='msg_cont'><div class='msg notification'><b class='username_msg'>${username}:</b> ${data}</div></div>`);
+          }else if(username == my_username){
+            $messages.append(`<div class='msg_cont'><div class='msg personal_msg'><b class='username_msg'>${username}:</b> ${data}</div></div>`);
+          }else{
+            $messages.append(`<div class='msg_cont'><div class='msg'><b class='username_msg'>${username}:</b> ${data}</div></div>`);
+          }
+          
+        });
+
+        // listener, whenever the server emits 'updaterooms', this updates the room the client is in
+        socket.on('updaterooms', function(rooms, current_room, numbers, types) {
+          console.log('CR: ' +current_room);
+            $('.public_rooms').empty();
+            $.each(rooms, function(key, value) {
+                if(types[key] == 'Public'){
+                  $('.public_rooms').append(`<a id='${value}' class='mdl-navigation__link' href="#" onclick="switchRoom('${value}')">${value} (${numbers[key]})</a>`);
+                }
+            });
+        });
+
+        socket.on('update roomDisplay', function(newroom, number, type){
+          if(type == 'Public'){
+            $roomDisplay.html(`${newroom}(${number}) - ${url}/${newroom}`);
+            
+          }else {
+            $roomDisplay.html(`<i class="material-icons">lock</i> - ${newroom}(${number}) - ${url}/${newroom}`);
+          }
+
+          $('.current_roomHolder').html(`<a id='${newroom}' class='current_room mdl-color-text--indigo mdl-navigation__link' href="#" onclick="switchRoom('${newroom}')">${newroom} (${number})</a>`);
+
+        });
+
+        function switchRoom(room){
+          $messages.html('');
+          socket.emit('switchRoom', room);
+        }
+
+        $('#messageInput').keypress(function(e) {
+          if(e.which == 13) {
+            $(this).blur();
+            let message = $('#messageInput').val().replace(/(<([^>]+)>)/ig,"");
+            socket.emit('sendchat', message);
+            $('#messageInput').val('');
+          }
+        });
+        
+        function addRoom() {
+          $('#addRoom').fadeToggle();
+          let current_icon = $('.room_event i').html();
+          if(current_icon == 'add') {
+            $('.room_event i').html('close');
+          }else {
+            $('.room_event i').html('add');
+          }
+        }
+
+        $addRoomForm.submit(function(e){
+          e.preventDefault();
+
+          let roomNameProtected = $roomName.val().replace(/(<([^>]+)>)/ig,"");
+
+          if(/\s/g.test(roomNameProtected)) {
+            $roomError.html("No whitespaces Allowed");
+          }else if(roomNameProtected == ''){
+            $roomError.html("Field cannot be empty");
+          }else if(roomNameProtected.indexOf('/') > -1){
+            $roomError.html("Slashes are not allowed");
+          }else{
+            if(/\s/g.test($roomPass.val())) {
+              $roomPassError.html("No whitespaces allowed.");
+            }else{
+              socket.emit('unique room', roomNameProtected, function(data){
+                if(data){
+                  let userdata = roomNameProtected + ' ' +$roomPass.val();
+                  alert(userdata);
+                  
+                  socket.emit('add room', userdata, function(datar){
+                    if(datar) {
+                      switchRoom(datar);
+                    }
+                  });
+                  $roomName.val('');
+                  $roomPass.val('');
+                  addRoom();
+                }else{
+                  $roomPassError.html("This chat name is in use.");
+                }
+              });
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

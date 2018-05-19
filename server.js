@@ -38,7 +38,7 @@ app.use(function(req, res, next) {
 		if (rooms.names.indexOf(current_room) != -1 || current_room == ''){
 			res.sendFile(__dirname + '/index.html');
 		}else {
-			res.sendFile(__dirname + '/404.html');
+			res.sendFile(__dirname + '/errors/404.html');
 		}
 
 		
@@ -46,7 +46,7 @@ app.use(function(req, res, next) {
 		
 
 	}else{
-		res.sendFile(__dirname + '/illentry.html');
+		res.sendFile(__dirname + '/errors/illentry.html');
 	}
 
 });
