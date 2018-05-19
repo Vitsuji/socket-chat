@@ -1,0 +1,16 @@
+{
+  "name": "socket-chat-multiple",
+  "version": "1.0.0",
+  "description": "Multiple chat rooms",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js"
+  },
+  "author": "me",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "*",
+    "socket.io": "*",
+    "url": "^0.11.0"
+  }
+}
